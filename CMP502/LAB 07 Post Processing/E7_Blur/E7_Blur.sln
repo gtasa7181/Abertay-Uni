@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "E7_Blur", "E7_Blur\E7_Blur.vcxproj", "{74BFD6C4-0DE4-42F5-99A4-B2B6CEA5BBB9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DXFramework", "DXFramework\DXFramework.vcxproj", "{E887C38B-1273-433A-9DAC-A153DA5CF145}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{74BFD6C4-0DE4-42F5-99A4-B2B6CEA5BBB9}.Debug|x64.ActiveCfg = Debug|x64
+		{74BFD6C4-0DE4-42F5-99A4-B2B6CEA5BBB9}.Debug|x64.Build.0 = Debug|x64
+		{74BFD6C4-0DE4-42F5-99A4-B2B6CEA5BBB9}.Release|x64.ActiveCfg = Release|x64
+		{74BFD6C4-0DE4-42F5-99A4-B2B6CEA5BBB9}.Release|x64.Build.0 = Release|x64
+		{E887C38B-1273-433A-9DAC-A153DA5CF145}.Debug|x64.ActiveCfg = Debug|x64
+		{E887C38B-1273-433A-9DAC-A153DA5CF145}.Debug|x64.Build.0 = Debug|x64
+		{E887C38B-1273-433A-9DAC-A153DA5CF145}.Release|x64.ActiveCfg = Release|x64
+		{E887C38B-1273-433A-9DAC-A153DA5CF145}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0DB64CCB-2F5D-4576-A3E0-0823BFB70F8F}
+	EndGlobalSection
+EndGlobal
