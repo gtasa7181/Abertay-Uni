@@ -30,9 +30,6 @@
     <ClCompile Include="TextureShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WaterShader.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="WaterShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextureShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -70,10 +70,10 @@
     <FxCompile Include="shaders\texture_vs.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
-    <FxCompile Include="water_vs.hlsl">
+    <FxCompile Include="waterr_vs.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
-    <FxCompile Include="water_ps.hlsl">
+    <FxCompile Include="PixelShader.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>
