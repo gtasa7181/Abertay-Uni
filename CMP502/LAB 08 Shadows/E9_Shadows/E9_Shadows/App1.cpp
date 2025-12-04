@@ -8,7 +8,7 @@ App1::App1()
 	oceanTime = 0.0f;
 	waveAmplitude = 0.5f;
 	waveFrequency = 1.0f;
-	waveSpeed = 1.0f;
+	waveSpeed = 2.0f;
 }
 
 void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight, Input *in, bool VSYNC, bool FULL_SCREEN)
@@ -139,8 +139,8 @@ void App1::finalPass()
 
 	//RENDER OCEAN
 	worldMatrix = renderer->getWorldMatrix();
-	worldMatrix = XMMatrixScaling(100.0f, 1.0f, 100.0f);  // Make ocean huge
-	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -2.0f, 0.0f)); // Lower it slightly
+	worldMatrix = XMMatrixScaling(10.0f, 1.0f, 10.0f);  
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -5.0f, 10.0f));
 
 	oceanMesh->sendData(renderer->getDeviceContext());
 	waterShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
@@ -153,14 +153,14 @@ void App1::finalPass()
 		textureMgr->getTexture(L"brick"), shadowMap->getDepthMapSRV(), light);
 	shadowShader->render(renderer->getDeviceContext(), mesh->getIndexCount());
 
-	// Render model
+	/* Render model
 	worldMatrix = renderer->getWorldMatrix();
 	worldMatrix = XMMatrixTranslation(0.f, 2.f, 5.f);
 	XMMATRIX scaleMatrix = XMMatrixScaling(0.5f, 0.5f, 0.5f);
 	worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);
 	model->sendData(renderer->getDeviceContext());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), shadowMap->getDepthMapSRV(), light);
-	shadowShader->render(renderer->getDeviceContext(), model->getIndexCount());
+	shadowShader->render(renderer->getDeviceContext(), model->getIndexCount());*/
 
 	gui();
 	renderer->endScene();
