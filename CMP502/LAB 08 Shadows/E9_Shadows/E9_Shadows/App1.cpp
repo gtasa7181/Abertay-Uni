@@ -4,7 +4,11 @@
 
 App1::App1()
 {
-
+	// Initialize ocean parameters
+	oceanTime = 0.0f;
+	waveAmplitude = 0.5f;
+	waveFrequency = 1.0f;
+	waveSpeed = 1.0f;
 }
 
 void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight, Input *in, bool VSYNC, bool FULL_SCREEN)
@@ -16,6 +20,10 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	mesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
 	model = new AModel(renderer->getDevice(), "res/teapot.obj");
 	textureMgr->loadTexture(L"brick", L"res/brick1.dds");
+
+	// Create ocean shader and mesh
+	waterShader = new WaterShader(renderer->getDevice(), hwnd);
+	oceanMesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext(), 100); // Large ocean plane
 
 	// initial shaders
 	textureShader = new TextureShader(renderer->getDevice(), hwnd);
@@ -61,6 +69,9 @@ bool App1::frame()
 		return false;
 	}
 	
+	// Update ocean animation time
+	oceanTime += timer->getTime();
+
 	// Render the graphics.
 	result = render();
 	if (!result)
@@ -125,6 +136,17 @@ void App1::finalPass()
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
 	worldMatrix = XMMatrixTranslation(-50.f, 0.f, -10.f);
+
+	//RENDER OCEAN
+	worldMatrix = renderer->getWorldMatrix();
+	worldMatrix = XMMatrixScaling(100.0f, 1.0f, 100.0f);  // Make ocean huge
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -2.0f, 0.0f)); // Lower it slightly
+
+	oceanMesh->sendData(renderer->getDeviceContext());
+	waterShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
+		textureMgr->getTexture(L"brick"), light, oceanTime, waveAmplitude, waveFrequency, waveSpeed);
+	waterShader->render(renderer->getDeviceContext(), oceanMesh->getIndexCount());
+
 	// Render floor
 	mesh->sendData(renderer->getDeviceContext());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, 
@@ -133,7 +155,7 @@ void App1::finalPass()
 
 	// Render model
 	worldMatrix = renderer->getWorldMatrix();
-	worldMatrix = XMMatrixTranslation(0.f, 7.f, 5.f);
+	worldMatrix = XMMatrixTranslation(0.f, 2.f, 5.f);
 	XMMATRIX scaleMatrix = XMMatrixScaling(0.5f, 0.5f, 0.5f);
 	worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);
 	model->sendData(renderer->getDeviceContext());

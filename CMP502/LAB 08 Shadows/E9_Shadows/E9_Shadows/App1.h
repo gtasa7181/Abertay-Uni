@@ -7,6 +7,8 @@
 #include "TextureShader.h"
 #include "ShadowShader.h"
 #include "DepthShader.h"
+#include "WaterShader.h"
+
 
 class App1 : public BaseApplication
 {
@@ -34,6 +36,17 @@ private:
 	DepthShader* depthShader;
 
 	ShadowMap* shadowMap;
+
+	// Ocean water
+	WaterShader* waterShader;
+	PlaneMesh* oceanMesh;
+	float oceanTime;
+
+	// Wave parameters (for UI control later)
+	float waveAmplitude;
+	float waveFrequency;
+	float waveSpeed;
+
 };
 
 #endif
