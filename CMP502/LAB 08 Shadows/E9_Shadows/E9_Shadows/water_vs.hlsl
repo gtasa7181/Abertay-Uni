@@ -33,22 +33,36 @@ OutputType main(InputType input)
 {
     OutputType output;
     
-   // Calculate wave displacement
-    float wave1 = sin(input.position.x * waveFrequency + time * waveSpeed) * waveAmplitude;
-    float wave2 = cos(input.position.z * waveFrequency * 0.7 + time * waveSpeed * 1.3) * waveAmplitude * 0.5;
-    float wave3 = sin((input.position.x + input.position.z) * waveFrequency * 0.5 + time * waveSpeed * 0.7) * waveAmplitude * 0.3; // NEW!
+    // Calculate wave displacement with 5 layered waves for realistic ocean effect
+    // Large rolling waves
+    float wave1 = sin(input.position.x * waveFrequency * time * waveSpeed) * waveAmplitude;
+    float wave2 = cos(input.position.z * waveFrequency * 0.7 * time * (waveSpeed * 1.3)) * waveAmplitude * 0.5;
 
-    // Combine waves
-    float displacement = wave1 + wave2 + wave3;
+    // Medium choppy waves  
+    float wave3 = sin((input.position.x + input.position.z) * waveFrequency * 0.5 + time * waveSpeed * 0.7) * waveAmplitude * 0.3;
+    float wave4 = cos((input.position.x * 0.8 - input.position.z * 1.2) * waveFrequency * 1.5 + time * waveSpeed * 1.1) * waveAmplitude * 0.2;
+
+    // Small detail ripples
+    float wave5 = sin((input.position.x * 2.0 + input.position.z * 1.5) * waveFrequency * 3.0 + time * waveSpeed * 2.0) * waveAmplitude * 0.15;
+
+    // Combine all waves
+    float displacement = wave1 + wave2 + wave3 + wave4 + wave5;
+
     
     // Apply displacement to Y position
     input.position.y += displacement;
     
-    // Calculate wave normal for lighting
-    float dx = cos(input.position.x * waveFrequency + time * waveSpeed) * waveAmplitude * waveFrequency;
-    float dz = -sin(input.position.z * waveFrequency * 0.7 + time * waveSpeed * 1.3) * waveAmplitude * 0.5 * waveFrequency * 0.7;
-    
+    // Calculate wave normal for lighting (derivatives of all 5 waves)
+    float dx = cos(input.position.x * waveFrequency * time * waveSpeed) * waveAmplitude * waveFrequency
+         - sin((input.position.x * 0.8 - input.position.z * 1.2) * waveFrequency * 1.5 + time * waveSpeed * 1.1) * waveAmplitude * 0.2 * waveFrequency * 1.5 * 0.8
+         + cos((input.position.x * 2.0 + input.position.z * 1.5) * waveFrequency * 3.0 + time * waveSpeed * 2.0) * waveAmplitude * 0.15 * waveFrequency * 3.0 * 2.0;
+         
+    float dz = -sin(input.position.z * waveFrequency * 0.7 * time * waveSpeed * 1.3) * waveAmplitude * 0.5 * waveFrequency * 0.7
+         + sin((input.position.x * 0.8 - input.position.z * 1.2) * waveFrequency * 1.5 + time * waveSpeed * 1.1) * waveAmplitude * 0.2 * waveFrequency * 1.5 * 1.2
+         + cos((input.position.x * 2.0 + input.position.z * 1.5) * waveFrequency * 3.0 + time * waveSpeed * 2.0) * waveAmplitude * 0.15 * waveFrequency * 3.0 * 1.5;
+
     float3 waveNormal = normalize(float3(-dx, 1.0, -dz));
+
     
     // Transform position
     output.position = mul(input.position, worldMatrix);

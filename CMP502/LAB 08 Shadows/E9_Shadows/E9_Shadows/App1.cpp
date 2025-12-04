@@ -6,9 +6,10 @@ App1::App1()
 {
 	// Initialize ocean parameters
 	oceanTime = 0.0f;
-	waveAmplitude = 0.3f;
-	waveFrequency = 0.5f;
-	waveSpeed = 0.8f;
+	waveAmplitude = 1.5f;     // Really tall waves
+	waveFrequency = 1.0f;     // More wave peaks
+	waveSpeed = 1.0f;         // Fast moving
+
 }
 
 void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight, Input *in, bool VSYNC, bool FULL_SCREEN)
@@ -17,13 +18,13 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
 
 	// Create Mesh object and shader object
-	mesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
+	mesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext(), 200);  // Match ocean size
 	model = new AModel(renderer->getDevice(), "res/teapot.obj");
 	textureMgr->loadTexture(L"brick", L"res/brick1.dds");
 
 	// Create ocean shader and mesh
 	waterShader = new WaterShader(renderer->getDevice(), hwnd);
-	oceanMesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext(), 200); // Large ocean plane
+	oceanMesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext(), 200); // small ocean plane
 
 	// initial shaders
 	textureShader = new TextureShader(renderer->getDevice(), hwnd);
@@ -72,7 +73,6 @@ bool App1::frame()
 	// Update ocean animation time
 	oceanTime += timer->getTime();
 
-	camera->setMoveSpeed(20.0f);
 
 	// Render the graphics.
 	result = render();
