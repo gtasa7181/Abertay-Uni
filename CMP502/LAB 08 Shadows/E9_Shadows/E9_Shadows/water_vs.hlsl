@@ -33,12 +33,13 @@ OutputType main(InputType input)
 {
     OutputType output;
     
-    // Calculate wave displacement
+   // Calculate wave displacement
     float wave1 = sin(input.position.x * waveFrequency + time * waveSpeed) * waveAmplitude;
     float wave2 = cos(input.position.z * waveFrequency * 0.7 + time * waveSpeed * 1.3) * waveAmplitude * 0.5;
-    
+    float wave3 = sin((input.position.x + input.position.z) * waveFrequency * 0.5 + time * waveSpeed * 0.7) * waveAmplitude * 0.3; // NEW!
+
     // Combine waves
-    float displacement = wave1 + wave2;
+    float displacement = wave1 + wave2 + wave3;
     
     // Apply displacement to Y position
     input.position.y += displacement;
@@ -56,7 +57,9 @@ OutputType main(InputType input)
     output.position = mul(output.position, projectionMatrix);
     
     // Pass through texture coordinates
-    output.tex = input.tex;
+    // Pass through texture coordinates with tiling
+    output.tex = input.tex * 20.0f; // Repeat texture 20 times across the mesh
+
     
     // Transform normal
     output.normal = mul(waveNormal, (float3x3) worldMatrix);
