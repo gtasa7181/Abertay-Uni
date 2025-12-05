@@ -18,13 +18,13 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
 
 	// Create Mesh object and shader object
-	mesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext(), 200);  // Match ocean size
+	mesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext(), 50);  // Match ocean size
 	model = new AModel(renderer->getDevice(), "res/teapot.obj");
 	textureMgr->loadTexture(L"brick", L"res/brick1.dds");
 
 	// Create ocean shader and mesh
 	waterShader = new WaterShader(renderer->getDevice(), hwnd);
-	oceanMesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext(), 200); // small ocean plane
+	oceanMesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext(), 50); // small ocean plane
 
 	// initial shaders
 	textureShader = new TextureShader(renderer->getDevice(), hwnd);

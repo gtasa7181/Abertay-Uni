@@ -99,7 +99,7 @@ void Camera::moveForward()
 	float radians;
 
 	// Update the forward movement based on the frame time
-	speed = frameTime * 5.f;
+	speed = frameTime * 50.f;
 	
 	// Convert degrees to radians.
 	radians = rotation.y * 0.0174532f;
@@ -115,7 +115,7 @@ void Camera::moveBackward()
 	float radians;
 
 	// Update the backward movement based on the frame time
-	speed = frameTime * 5.f;// *0.5f;
+	speed = frameTime * 20.f;// *0.5f;
 
 	// Convert degrees to radians.
 	radians = rotation.y * 0.0174532f;
