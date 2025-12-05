@@ -263,56 +263,27 @@ void App1::finalPass()
 	renderer->endScene();
 }
 
-
-
 void App1::gui()
 {
-	// Force turn off unnecessary shader stages.
+	// Shader setup
 	renderer->getDeviceContext()->GSSetShader(NULL, NULL, 0);
 	renderer->getDeviceContext()->HSSetShader(NULL, NULL, 0);
 	renderer->getDeviceContext()->DSSetShader(NULL, NULL, 0);
 
-	// Build UI
+	// Build ALL UI first
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
 
-	// Render UI
+	ImGui::Begin("Time of Day");
+	// ... time controls ...
+	ImGui::End();
+
+	ImGui::Begin("Ocean Controls");
+	// ... wave controls ...
+	ImGui::End();
+
+	// Render LAST - after all UI is built
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-	// Time-of-Day Controls
-	ImGui::Begin("Time of Day");
-
-	// Time slider (0-24 hours)
-	ImGui::SliderFloat("Time", &timeOfDay, 0.0f, 24.0f, "%.1f hours");
-
-	// Auto-advance toggle
-	ImGui::Checkbox("Auto Advance", &autoAdvanceTime);
-
-	// Time speed control (only shown if auto-advance is enabled)
-	if (autoAdvanceTime)
-	{
-		ImGui::SliderFloat("Time Speed", &timeSpeed, 0.0f, 5.0f, "%.2fx");
-	}
-
-	// Show current time period
-	if (timeOfDay >= 5.0f && timeOfDay < 7.0f)
-		ImGui::Text("Current: Dawn");
-	else if (timeOfDay >= 7.0f && timeOfDay < 17.0f)
-		ImGui::Text("Current: Day");
-	else if (timeOfDay >= 17.0f && timeOfDay < 19.0f)
-		ImGui::Text("Current: Dusk");
-	else
-		ImGui::Text("Current: Night");
-
-	ImGui::End();
-
-	// Wave Controls (your existing code)
-	ImGui::Begin("Ocean Controls");
-	ImGui::SliderFloat("Wave Amplitude", &waveAmplitude, 0.0f, 5.0f);
-	ImGui::SliderFloat("Wave Frequency", &waveFrequency, 0.0f, 3.0f);
-	ImGui::SliderFloat("Wave Speed", &waveSpeed, 0.0f, 3.0f);
-	ImGui::End();
 }
-
 
