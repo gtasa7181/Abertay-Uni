@@ -21,6 +21,7 @@ public:
 	bool frame();
 
 protected:
+	void updateTimeOfDay();
 	bool render();
 	void depthPass();
 	void finalPass();
@@ -46,6 +47,10 @@ private:
 	float waveAmplitude;
 	float waveFrequency;
 	float waveSpeed;
+	// Time-of-day system
+	float timeOfDay;           // Current time (0.0 = midnight, 12.0 = noon, 24.0 = midnight)
+	float timeSpeed;           // How fast time advances (0.0 = paused, 1.0 = normal)
+	bool autoAdvanceTime;      // Whether time advances automatically
 
 };
 

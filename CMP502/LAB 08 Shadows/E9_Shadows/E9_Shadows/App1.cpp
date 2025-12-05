@@ -9,6 +9,11 @@ App1::App1()
 	waveAmplitude = 1.5f;     // Really tall waves
 	waveFrequency = 1.0f;     // More wave peaks
 	waveSpeed = 1.0f;         // Fast moving
+	// Initialize time-of-day system
+	timeOfDay = 12.0f;         // Start at noon
+	timeSpeed = 0.0f;          // Start paused so you can control it
+	autoAdvanceTime = false;   // Manual control initially
+
 
 }
 
@@ -73,6 +78,9 @@ bool App1::frame()
 	// Update ocean animation time
 	oceanTime += timer->getTime();
 
+	// Update time-of-day lighting
+	updateTimeOfDay();
+
 
 	// Render the graphics.
 	result = render();
@@ -82,6 +90,98 @@ bool App1::frame()
 	}
 
 	return true;
+}
+
+void App1::updateTimeOfDay()
+{
+	// Auto-advance time if enabled
+	if (autoAdvanceTime)
+	{
+		timeOfDay += timer->getTime() * timeSpeed;
+
+		// Wrap time to 0-24 range
+		if (timeOfDay >= 24.0f)
+			timeOfDay -= 24.0f;
+		else if (timeOfDay < 0.0f)
+			timeOfDay += 24.0f;
+	}
+
+	// Calculate light color and intensity based on time
+	XMFLOAT4 lightColor;
+	XMFLOAT4 ambientColor;
+	float lightIntensity = 1.0f;
+
+	// Time periods:
+	// 0-5: Night (dark blue)
+	// 5-7: Dawn (orange/pink)
+	// 7-17: Day (bright white/yellow)
+	// 17-19: Dusk (orange/red)
+	// 19-24: Night (dark blue)
+
+	if (timeOfDay >= 0.0f && timeOfDay < 5.0f)
+	{
+		// Night - Dark blue light
+		lightColor = XMFLOAT4(0.2f, 0.2f, 0.4f, 1.0f);
+		ambientColor = XMFLOAT4(0.05f, 0.05f, 0.1f, 1.0f);
+		lightIntensity = 0.3f;
+	}
+	else if (timeOfDay >= 5.0f && timeOfDay < 7.0f)
+	{
+		// Dawn - Orange/pink transition
+		float t = (timeOfDay - 5.0f) / 2.0f;  // 0 to 1
+		lightColor = XMFLOAT4(
+			0.2f + t * 0.8f,  // 0.2 -> 1.0
+			0.2f + t * 0.6f,  // 0.2 -> 0.8
+			0.4f + t * 0.2f,  // 0.4 -> 0.6
+			1.0f
+		);
+		ambientColor = XMFLOAT4(
+			0.05f + t * 0.20f,
+			0.05f + t * 0.15f,
+			0.1f + t * 0.15f,
+			1.0f
+		);
+		lightIntensity = 0.3f + t * 0.7f;
+	}
+	else if (timeOfDay >= 7.0f && timeOfDay < 17.0f)
+	{
+		// Day - Bright white/yellow
+		lightColor = XMFLOAT4(1.0f, 1.0f, 0.9f, 1.0f);
+		ambientColor = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+		lightIntensity = 1.0f;
+	}
+	else if (timeOfDay >= 17.0f && timeOfDay < 19.0f)
+	{
+		// Dusk - Orange/red sunset
+		float t = (timeOfDay - 17.0f) / 2.0f;  // 0 to 1
+		lightColor = XMFLOAT4(
+			1.0f,
+			0.8f - t * 0.6f,  // 0.8 -> 0.2
+			0.6f - t * 0.2f,  // 0.6 -> 0.4
+			1.0f
+		);
+		ambientColor = XMFLOAT4(
+			0.25f - t * 0.20f,
+			0.20f - t * 0.15f,
+			0.25f - t * 0.15f,
+			1.0f
+		);
+		lightIntensity = 1.0f - t * 0.7f;
+	}
+	else  // 19-24: Night
+	{
+		// Night - Dark blue light
+		lightColor = XMFLOAT4(0.2f, 0.2f, 0.4f, 1.0f);
+		ambientColor = XMFLOAT4(0.05f, 0.05f, 0.1f, 1.0f);
+		lightIntensity = 0.3f;
+	}
+
+	// Apply the calculated colors to the light
+	light->setAmbientColour(ambientColor.x, ambientColor.y, ambientColor.z, ambientColor.w);
+	light->setDiffuseColour(lightColor.x * lightIntensity,
+		lightColor.y * lightIntensity,
+		lightColor.z * lightIntensity,
+		lightColor.w);
 }
 
 bool App1::render()
@@ -179,5 +279,40 @@ void App1::gui()
 	// Render UI
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+	// Time-of-Day Controls
+	ImGui::Begin("Time of Day");
+
+	// Time slider (0-24 hours)
+	ImGui::SliderFloat("Time", &timeOfDay, 0.0f, 24.0f, "%.1f hours");
+
+	// Auto-advance toggle
+	ImGui::Checkbox("Auto Advance", &autoAdvanceTime);
+
+	// Time speed control (only shown if auto-advance is enabled)
+	if (autoAdvanceTime)
+	{
+		ImGui::SliderFloat("Time Speed", &timeSpeed, 0.0f, 5.0f, "%.2fx");
+	}
+
+	// Show current time period
+	if (timeOfDay >= 5.0f && timeOfDay < 7.0f)
+		ImGui::Text("Current: Dawn");
+	else if (timeOfDay >= 7.0f && timeOfDay < 17.0f)
+		ImGui::Text("Current: Day");
+	else if (timeOfDay >= 17.0f && timeOfDay < 19.0f)
+		ImGui::Text("Current: Dusk");
+	else
+		ImGui::Text("Current: Night");
+
+	ImGui::End();
+
+	// Wave Controls (your existing code)
+	ImGui::Begin("Ocean Controls");
+	ImGui::SliderFloat("Wave Amplitude", &waveAmplitude, 0.0f, 5.0f);
+	ImGui::SliderFloat("Wave Frequency", &waveFrequency, 0.0f, 3.0f);
+	ImGui::SliderFloat("Wave Speed", &waveSpeed, 0.0f, 3.0f);
+	ImGui::End();
 }
+
 
