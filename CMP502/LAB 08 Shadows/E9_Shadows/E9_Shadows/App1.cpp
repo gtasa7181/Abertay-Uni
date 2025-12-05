@@ -246,9 +246,11 @@ void App1::finalPass()
 	// CREATE A DARKER UNDERWATER LIGHT for seabed
 	Light* underwaterLight = new Light();
 	underwaterLight->setAmbientColour(0.05f, 0.08f, 0.12f, 1.0f);  // Very dark blue ambient
-	underwaterLight->setDiffuseColour(0.15f, 0.25f, 0.35f, 1.0f);  // Dim blue-tinted diffuse
-	underwaterLight->setDirection(light->getDirection());  // Same direction as main light
-	underwaterLight->setPosition(light->getPosition());     // Same position
+	underwaterLight->setDiffuseColour(0.18f, 0.25f, 0.35f, 1.0f);  // Dim blue-tinted diffuse
+	XMFLOAT3 mainLightDir = light->getDirection();
+	XMFLOAT3 mainLightPos = light->getPosition();
+	underwaterLight->setDirection(mainLightDir.x, mainLightDir.y, mainLightDir.z);  // Same direction as main light
+	underwaterLight->setPosition(mainLightPos.x, mainLightPos.y, mainLightPos.z);  // Same position
 	underwaterLight->generateOrthoMatrix(100.0f, 100.0f, 0.1f, 100.f);
 	underwaterLight->generateViewMatrix();
 
