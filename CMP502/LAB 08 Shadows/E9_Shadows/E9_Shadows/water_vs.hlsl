@@ -33,20 +33,32 @@ OutputType main(InputType input)
 {
     OutputType output;
     
-    // Calculate wave displacement with 5 layered waves for realistic ocean effect
-    // Large rolling waves
-    float wave1 = sin(input.position.x * waveFrequency * time * waveSpeed) * waveAmplitude;
-    float wave2 = cos(input.position.z * waveFrequency * 0.7 * time * (waveSpeed * 1.3)) * waveAmplitude * 0.5;
+    //MODIFIED WAVE CALCULATIONS
+    // Experimented with reducing peak sharpness by dampening amplitude at wave crests
 
-    // Medium choppy waves  
-    float wave3 = sin((input.position.x + input.position.z) * waveFrequency * 0.5 + time * waveSpeed * 0.7) * waveAmplitude * 0.3;
-    float wave4 = cos((input.position.x * 0.8 - input.position.z * 1.2) * waveFrequency * 1.5 + time * waveSpeed * 1.1) * waveAmplitude * 0.2;
+    // Large dominant waves - softened peaks
+    float wave1_raw = sin((input.position.x * 0.5 + input.position.z * 0.3) * waveFrequency * 0.5 + time * waveSpeed * 0.7);
+    float wave1 = wave1_raw * (1.0 - 0.25 * abs(wave1_raw)) * waveAmplitude * 0.5;
 
-    // Small detail ripples
-    float wave5 = sin((input.position.x * 2.0 + input.position.z * 1.5) * waveFrequency * 3.0 + time * waveSpeed * 2.0) * waveAmplitude * 0.15;
+    // Medium choppy waves - softened peaks  
+    float wave2_raw = cos((input.position.x * 0.8 - input.position.z * 1.2) * waveFrequency * 1.5 + time * waveSpeed * 1.1);
+    float wave2 = wave2_raw * (1.0 - 0.25 * abs(wave2_raw)) * waveAmplitude * 0.3;
+
+    // Small fast waves - softened peaks
+    float wave3_raw = sin((input.position.x * 1.0 + input.position.z * 0.7) * waveFrequency * 2.0 + time * waveSpeed * 1.5);
+    float wave3 = wave3_raw * (1.0 - 0.25 * abs(wave3_raw)) * waveAmplitude * 0.2;
+
+    // Medium choppy waves - softened peaks
+    float wave4_raw = cos((input.position.x * 0.8 - input.position.z * 1.2) * waveFrequency * 1.5 + time * waveSpeed * 1.1);
+    float wave4 = wave4_raw * (1.0 - 0.25 * abs(wave4_raw)) * waveAmplitude * 0.2;
+
+    // Small detail ripples - softened peaks
+    float wave5_raw = sin((input.position.x * 2.0 + input.position.z * 1.5) * waveFrequency * 3.0 + time * waveSpeed * 2.0);
+    float wave5 = wave5_raw * (1.0 - 0.25 * abs(wave5_raw)) * waveAmplitude * 0.15;
 
     // Combine all waves
     float displacement = wave1 + wave2 + wave3 + wave4 + wave5;
+
 
     
     // Apply displacement to Y position

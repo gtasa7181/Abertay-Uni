@@ -229,31 +229,40 @@ void App1::depthPass()
 
 void App1::finalPass()
 {
-	// Clear the scene. (default blue colour)
+	// Clear the scene
 	renderer->beginScene(0.39f, 0.58f, 0.92f, 1.0f);
 	camera->update();
 
-	// get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
+	// Get matrices
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
-	// === RENDER SEABED/OCEAN FLOOR (visible geometry) ===
+	// === RENDER SEABED/OCEAN FLOOR (with underwater darkness) ===
 	worldMatrix = renderer->getWorldMatrix();
-	worldMatrix = XMMatrixScaling(10.0f, 1.0f, 10.0f);  // Match the size from depthPass
-	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -8.0f, 10.0f));  // Same position as depthPass
+	worldMatrix = XMMatrixScaling(10.0f, 1.0f, 10.0f);
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -15.0f, 10.0f));
+
+	// CREATE A DARKER UNDERWATER LIGHT for seabed
+	Light* underwaterLight = new Light();
+	underwaterLight->setAmbientColour(0.05f, 0.08f, 0.12f, 1.0f);  // Very dark blue ambient
+	underwaterLight->setDiffuseColour(0.15f, 0.25f, 0.35f, 1.0f);  // Dim blue-tinted diffuse
+	underwaterLight->setDirection(light->getDirection());  // Same direction as main light
+	underwaterLight->setPosition(light->getPosition());     // Same position
+	underwaterLight->generateOrthoMatrix(100.0f, 100.0f, 0.1f, 100.f);
+	underwaterLight->generateViewMatrix();
 
 	mesh->sendData(renderer->getDeviceContext());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
-		textureMgr->getTexture(L"brick"), shadowMap->getDepthMapSRV(), light);
+		textureMgr->getTexture(L"brick"), shadowMap->getDepthMapSRV(), underwaterLight);
 	shadowShader->render(renderer->getDeviceContext(), mesh->getIndexCount());
 
+	delete underwaterLight;  // Clean up temporary light
 
-	//RENDER OCEAN
+	// RENDER OCEAN (keep your existing ocean rendering code)
 	worldMatrix = renderer->getWorldMatrix();
-	worldMatrix = XMMatrixScaling(10.0f, 1.0f, 10.0f);  
+	worldMatrix = XMMatrixScaling(10.0f, 1.0f, 10.0f);
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -5.0f, 10.0f));
-
 	oceanMesh->sendData(renderer->getDeviceContext());
 	waterShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
 		textureMgr->getTexture(L"brick"), light, oceanTime, waveAmplitude, waveFrequency, waveSpeed);
@@ -262,6 +271,7 @@ void App1::finalPass()
 	gui();
 	renderer->endScene();
 }
+
 
 void App1::gui()
 {
@@ -274,16 +284,41 @@ void App1::gui()
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
 
+	// Time-of-Day Controls
 	ImGui::Begin("Time of Day");
-	// ... time controls ...
+
+	// Time slider (0-24 hours)
+	ImGui::SliderFloat("Time", &timeOfDay, 0.0f, 24.0f, "%.1f hours");
+
+	// Auto-advance toggle
+	ImGui::Checkbox("Auto Advance", &autoAdvanceTime);
+
+	// Time speed control (only shown if auto-advance is enabled)
+	if (autoAdvanceTime)
+	{
+		ImGui::SliderFloat("Time Speed", &timeSpeed, 0.0f, 5.0f, "%.2fx");
+	}
+
+	// Show current time period
+	if (timeOfDay >= 5.0f && timeOfDay < 7.0f)
+		ImGui::Text("Current: Dawn");
+	else if (timeOfDay >= 7.0f && timeOfDay < 17.0f)
+		ImGui::Text("Current: Day");
+	else if (timeOfDay >= 17.0f && timeOfDay < 19.0f)
+		ImGui::Text("Current: Dusk");
+	else
+		ImGui::Text("Current: Night");
+
 	ImGui::End();
 
+	// Wave Controls
 	ImGui::Begin("Ocean Controls");
-	// ... wave controls ...
+	ImGui::SliderFloat("Wave Amplitude", &waveAmplitude, 0.0f, 5.0f);
+	ImGui::SliderFloat("Wave Frequency", &waveFrequency, 0.0f, 3.0f);
+	ImGui::SliderFloat("Wave Speed", &waveSpeed, 0.0f, 3.0f);
 	ImGui::End();
 
 	// Render LAST - after all UI is built
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
-
